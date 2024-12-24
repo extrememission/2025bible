@@ -1,0 +1,108 @@
+:root {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --border-color: #333333;
+    --highlight-color: #d4ff00;
+}
+
+[data-theme="light"] {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --border-color: #cccccc;
+    --highlight-color: #ffff00;
+}
+
+body {
+    font-family: "Titillium Web", sans-serif;
+    letter-spacing: 0.3em;
+    font-size: large;
+    color: var(--text-color);
+    background: var(--bg-color);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+}
+
+.search-container {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 10px;
+    background: var(--bg-color);
+    z-index: 100;
+}
+
+input[type="text"] {
+    font-family: "Titillium Web", sans-serif;
+    width: calc(100% - 40px);
+    padding: 15px;
+    text-align: center;
+    border-radius: 7px;
+    font-size: 20px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: solid var(--border-color) 1.5px;
+    letter-spacing: 0.3em;
+    outline: none;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    padding: 60px 10px 10px 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.box {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.verse-box {
+    grid-column: 1 / -1;
+    aspect-ratio: auto;
+    padding: 20px;
+    text-align: left;
+}
+
+.highlight {
+    text-shadow: 0 0 10px var(--highlight-color);
+    color: var(--highlight-color);
+}
+
+#theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px;
+    cursor: pointer;
+    background: var(--bg-color);
+    border: 1.5px solid var(--border-color);
+    border-radius: 50%;
+    z-index: 100;
+}
+
+@media (orientation: landscape) {
+    body {
+        transform: rotate(90deg);
+        transform-origin: left top;
+        width: 100vh;
+        height: 100vw;
+        overflow-x: hidden;
+        position: absolute;
+        top: 100%;
+        left: 0;
+    }
+}
