@@ -125,7 +125,7 @@ input[type="text"] {
     margin: 10px 0;
     background-color: black;
     border-radius: 7px;
-    cursor: pointer;
+    cursor: default;
     border: solid gray 1.5px;
     letter-spacing: 0.3em;
     white-space: pre-line;
@@ -134,6 +134,7 @@ input[type="text"] {
     -webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;
+    position: relative;
 }
 
 .verse-box:first-line, .result-box:first-line {
@@ -141,4 +142,23 @@ input[type="text"] {
     display: block;
     margin-bottom: 10px;
     letter-spacing: 0.3em;
+}
+
+.copy-icon {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    cursor: pointer;
+    font-size: 16px;
+    z-index: 2;
+}
+
+.copy-icon:hover {
+    opacity: 1;
+}
+
+.verse-content {
+    padding-right: 30px;
 }
