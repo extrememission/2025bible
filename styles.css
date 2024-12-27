@@ -33,8 +33,8 @@ body {
   transition: opacity 0.3s ease-in-out;
   text-align: center;
   white-space: pre-line;
-  font-size: small
-  letter-spacing: normal; 
+  font-size: small !important;
+  letter-spacing: normal;
 }
 
 .message-link {
