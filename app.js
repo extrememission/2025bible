@@ -195,78 +195,81 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function searchHandler() {
-        const searchTerm = searchInput.value.toLowerCase();
-        if (searchTerm.length < 3) {
-            booksContainer.innerHTML = '';
-            resultCount.textContent = 'Enter verse reference or search term to begin search.';
+    const searchTerm = searchInput.value.toLowerCase();
+    if (searchTerm.length < 3) {
+        booksContainer.innerHTML = '';
+        resultCount.textContent = 'Enter verse reference or search term to begin search.';
+        return;
+    }
+
+    booksContainer.innerHTML = '';
+    setTimeout(() => {
+        // Check if input matches reference pattern with colon
+        const referencePattern = /^([123]?\s*[a-z]+):(\d+)$/i;
+        const match = searchTerm.match(referencePattern);
+
+        if (match) {
+            const [_, bookChapter, verse] = match;
+            const [bookSearch, chapter] = bookChapter.trim().split(/\s+(?=\d+$)/);
+
+            // Find matching book including abbreviations
+            const bookId = Object.entries(bookNames).find(([_, name]) => {
+                const searchName = name.toLowerCase().replace(/\s+/g, '');
+                const searchTerm = bookSearch.toLowerCase().replace(/\s+/g, '');
+                return searchName.startsWith(searchTerm);
+            })?.[0];
+
+            if (bookId) {
+                const verses = getVersesByBookAndChapter(bookId, parseInt(chapter));
+                const targetVerse = verses.find(v => v.field[3] === parseInt(verse));
+
+                if (targetVerse) {
+                    resultCount.textContent = 'Reference found';
+                    const verseText = targetVerse.field[4];
+                    const fullText = `${verseText}\n—${bookNames[bookId]} ${chapter}:${verse}`;
+                    const resultBox = createBoxElement(fullText);
+                    resultBox.classList.add('result-box');
+                    resultBox.addEventListener('click', () => {
+                        toggleChapters(bookId);
+                        toggleVerses(bookId, chapter, verse);
+                        searchInput.value = '';
+                        resultCount.textContent = '';
+                    });
+                    booksContainer.appendChild(resultBox);
+                    return;
+                }
+            }
+            resultCount.textContent = 'Reference not found. Try a different format.';
             return;
         }
 
-        booksContainer.innerHTML = '';
-        setTimeout(() => {
-            // Check if input matches reference pattern with colon
-            const referencePattern = /^([a-z0-9\s]+):(\d+)$/i;
-            const match = searchTerm.match(referencePattern);
+        // Regular word search if not a reference
+        const results = bibleData.filter(verse =>
+            verse.field[4].toLowerCase().includes(searchTerm)
+        );
+        const highlightTerm = new RegExp(`(${searchTerm})`, 'gi');
+        resultCount.textContent = `Results: ${results.length}`;
 
-            if (match) {
-                const [_, bookChapter, verse] = match;
-                const [bookSearch, chapter] = bookChapter.trim().split(/\s+/);
-
-                // Find matching book including abbreviations
-                const bookId = Object.entries(bookNames).find(([_, name]) => 
-                    name.toLowerCase().startsWith(bookSearch.toLowerCase())
-                )?.[0];
-
-                if (bookId) {
-                    const verses = getVersesByBookAndChapter(bookId, parseInt(chapter));
-                    const targetVerse = verses.find(v => v.field[3] === parseInt(verse));
-
-                    if (targetVerse) {
-                        resultCount.textContent = 'Reference found';
-                        const verseText = targetVerse.field[4];
-                        const fullText = `${verseText}\n—${bookNames[bookId]} ${chapter}:${verse}`;
-                        const resultBox = createBoxElement(fullText);
-                        resultBox.classList.add('result-box');
-                        resultBox.addEventListener('click', () => {
-                            toggleChapters(bookId);
-                            toggleVerses(bookId, chapter, verse);
-                            searchInput.value = '';
-                            resultCount.textContent = '';
-                        });
-                        booksContainer.appendChild(resultBox);
-                        return;
-                    }
-                }
-                resultCount.textContent = 'Reference not found. Try a different format.';
-                return;
-            }
-
-            // Regular word search if not a reference
-            const results = bibleData.filter(verse =>
-                verse.field[4].toLowerCase().includes(searchTerm)
-            );
-            const highlightTerm = new RegExp(`(${searchTerm})`, 'gi');
-            resultCount.textContent = `Results: ${results.length}`;
-
-            results.forEach(result => {
-                const bookId = result.field[1];
-                const bookName = bookNames[bookId];
-                const chapter = result.field[2];
-                const verseNumber = result.field[3];
-                const verseText = result.field[4].replace(highlightTerm, '<span class="highlight">$1</span>');
-                const fullText = `${verseText}\n—${bookName} ${chapter}:${verseNumber}`;
-                const resultBox = createBoxElement(fullText);
-                resultBox.classList.add('result-box');
-                resultBox.addEventListener('click', () => {
-                    toggleChapters(bookId);
-                    toggleVerses(bookId, chapter, verseNumber);
-                    searchInput.value = '';
-                    resultCount.textContent = '';
-                });
-                booksContainer.appendChild(resultBox);
+        results.forEach(result => {
+            const bookId = result.field[1];
+            const bookName = bookNames[bookId];
+            const chapter = result.field[2];
+            const verseNumber = result.field[3];
+            const verseText = result.field[4].replace(highlightTerm, '<span class="highlight">$1</span>');
+            const fullText = `${verseText}\n—${bookName} ${chapter}:${verseNumber}`;
+            const resultBox = createBoxElement(fullText);
+            resultBox.classList.add('result-box');
+            resultBox.addEventListener('click', () => {
+                toggleChapters(bookId);
+                toggleVerses(bookId, chapter, verseNumber);
+                searchInput.value = '';
+                resultCount.textContent = '';
             });
-        }, 500);
-    }
+            booksContainer.appendChild(resultBox);
+        });
+    }, 500);
+}
+
 
 
 
