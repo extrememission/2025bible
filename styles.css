@@ -29,7 +29,6 @@ body {
   color: #00ff00;
   text-shadow: 0 0 10px #00ff00;
   font-family: "Titillium Web", sans-serif;
-  letter-spacing: 0.3em;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
   text-align: center;
