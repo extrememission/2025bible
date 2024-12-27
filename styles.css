@@ -34,6 +34,7 @@ body {
   text-align: center;
   white-space: pre-line;
   font-size: small
+  letter-spacing: normal; 
 }
 
 .message-link {
