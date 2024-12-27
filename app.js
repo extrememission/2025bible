@@ -120,68 +120,70 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         return Array.from(chapters).sort((a, b) => a - b);
     }
-
-    function toggleVerses(bookId, chapter, targetVerseNumber = null) {
-        booksContainer.innerHTML = '';
-        const verses = getVersesByBookAndChapter(bookId, chapter);
-        verses.forEach(verse => {
-            const verseNumber = verse.field[3];
-            const verseText = `${verse.field[4]}\n—${bookNames[bookId]} ${chapter}:${verseNumber}`;
-            const verseBox = document.createElement('div');
-            verseBox.className = 'box verse-box';
+    
+function toggleVerses(bookId, chapter, targetVerseNumber = null) {
+    booksContainer.innerHTML = '';
+    const verses = getVersesByBookAndChapter(bookId, chapter);
+    verses.forEach(verse => {
+        const verseNumber = verse.field[3];
+        const verseText = `${verse.field[4]}\n—${bookNames[bookId]} ${chapter}:${verseNumber}`;
+        const verseBox = document.createElement('div');
+        verseBox.className = 'box verse-box';
+        
+        const textDiv = document.createElement('div');
+        textDiv.className = 'verse-content';
+        textDiv.innerHTML = verseText;
+        
+        const copyIcon = document.createElement('span');
+        copyIcon.innerHTML = '⎘';
+        copyIcon.className = 'copy-icon';
+        
+        copyIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const parts = verseText.split('\n');
+            const formattedText = `${parts[0]}\n—${parts[1].substring(1)}`;
             
-            const textDiv = document.createElement('div');
-            textDiv.className = 'verse-content';
-            textDiv.innerHTML = verseText;
-            
-            const copyIcon = document.createElement('span');
-            copyIcon.innerHTML = '📋';
-            copyIcon.className = 'copy-icon';
-            copyIcon.style.cssText = 'position: absolute; bottom: 8px; right: 8px; cursor: pointer; font-size: 16px;';
-            
-            copyIcon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const parts = verseText.split('\n');
-                const formattedText = `${parts[0]}\n—${parts[1].substring(1)}`;
-                
-                if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(formattedText)
-                        .then(() => {
-                            copyIcon.innerHTML = '✓';
-                            setTimeout(() => copyIcon.innerHTML = '📋', 1000);
-                        });
-                }
-            });
-            
-            verseBox.appendChild(textDiv);
-            verseBox.appendChild(copyIcon);
-            verseBox.dataset.verse = verseNumber;
-            verseBox.dataset.bookId = bookId;
-            verseBox.dataset.chapter = chapter;
-            
-            verseBox.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                toggleChapters(bookId);
-            });
-            
-            addTouchListeners(verseBox);
-            booksContainer.appendChild(verseBox);
-
-            if (targetVerseNumber && parseInt(verseNumber) === parseInt(targetVerseNumber)) {
-                setTimeout(() => {
-                    const verseBoxRect = verseBox.getBoundingClientRect();
-                    const scrollTop = window.scrollY || window.pageYOffset;
-                    const offsetTop = verseBoxRect.top + scrollTop - 20;
-                    window.scrollTo({ top: offsetTop, behavior: 'smooth' });
-                    const highlightSpan = document.createElement('span');
-                    highlightSpan.className = 'highlight';
-                    highlightSpan.textContent = verse.field[4];
-                    textDiv.innerHTML = `${highlightSpan.outerHTML}\n—${bookNames[bookId]} ${chapter}:${verseNumber}`;
-                }, 100);
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(formattedText)
+                    .then(() => {
+                        copyIcon.innerHTML = '✓';
+                        setTimeout(() => copyIcon.innerHTML = '⎘', 1000);
+                    })
+                    .catch(() => fallbackCopyToClipboard(formattedText));
+            } else {
+                fallbackCopyToClipboard(formattedText);
             }
         });
-        showMessage("Tap the clipboard icon to copy a verse.\nTap here or swipe left to go back", true);
-    }
+        
+        verseBox.appendChild(textDiv);
+        verseBox.appendChild(copyIcon);
+        verseBox.dataset.verse = verseNumber;
+        verseBox.dataset.bookId = bookId;
+        verseBox.dataset.chapter = chapter;
+        
+        verseBox.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            toggleChapters(bookId);
+        });
+        
+        addTouchListeners(verseBox);
+        booksContainer.appendChild(verseBox);
+
+        if (targetVerseNumber && parseInt(verseNumber) === parseInt(targetVerseNumber)) {
+            setTimeout(() => {
+                const verseBoxRect = verseBox.getBoundingClientRect();
+                const scrollTop = window.scrollY || window.pageYOffset;
+                const offsetTop = verseBoxRect.top + scrollTop - 20;
+                window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+                const highlightSpan = document.createElement('span');
+                highlightSpan.className = 'highlight';
+                highlightSpan.textContent = verse.field[4];
+                textDiv.innerHTML = `${highlightSpan.outerHTML}\n—${bookNames[bookId]} ${chapter}:${verseNumber}`;
+            }, 100);
+        }
+    });
+    showMessage("Tap the copy icon to copy a verse.\nTap here or swipe left to go back", true);
+}
 
     function getVersesByBookAndChapter(bookId, chapter) {
         return bibleData.filter(verse =>
