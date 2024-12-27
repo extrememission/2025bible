@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultCount = document.getElementById('result-count');
     const stickyMessage = document.getElementById('sticky-message');
     const bibleData = [];
-
     const bookNames = {
         1: 'Genesis', 2: 'Exodus', 3: 'Leviticus', 4: 'Numbers', 5: 'Deuteronomy',
         6: 'Joshua', 7: 'Judges', 8: 'Ruth', 9: '1 Samuel', 10: '2 Samuel',
@@ -67,11 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showMessage("Welcome to the Extreme Mission Bible App\nSelect a book, or enter a search term to begin.");
     }
 
-    function applyUserSelectNone(element) {
-        element.style.webkitUserSelect = 'none';
-        element.style.userSelect = 'none';
-    }
-
     function addTouchListeners(element) {
         element.addEventListener('touchstart', handleTouchStart, { passive: false });
         element.addEventListener('touchend', handleTouchEnd, { passive: false });
@@ -79,10 +73,10 @@ document.addEventListener('DOMContentLoaded', () => {
         element.addEventListener('dblclick', (e) => {
             if (e.target.classList.contains('verse-box')) {
                 const verseText = e.target.innerText;
-                const parts = verseText.split(/\n\n|\n(?!\d)/);
-                const text = parts.slice(0, -1).join('\n');
-                const reference = parts.slice(-1)[0];
-                const formattedText = `${text}\n— ${reference.trim()}`;
+                const parts = verseText.split('\n');
+                const text = parts[0];
+                const reference = parts[1].substring(1); // Remove the em dash
+                const formattedText = `${text}\n—${reference}`;
                 navigator.clipboard.writeText(formattedText)
                     .then(() => alert('Verse copied to clipboard!'))
                     .catch(err => console.error('Error copying verse:', err));
@@ -90,13 +84,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    let startX, startY, touchStartTime;
+    let startX, startY;
     let touchTimer;
 
     function handleTouchStart(e) {
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
-        touchStartTime = new Date().getTime();
         touchTimer = setTimeout(() => {
             handleSingleClick(e.target);
         }, 500);
@@ -136,8 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
         chapters.forEach(chapter => {
             const chapterBox = createBoxElement(`${bookNames[bookId]} ${chapter}`);
             chapterBox.classList.add('chapter-box');
-            applyUserSelectNone(chapterBox);
-            addTouchListeners(chapterBox);
             chapterBox.dataset.chapter = chapter;
             chapterBox.dataset.bookId = bookId;
             chapterBox.addEventListener('click', () => toggleVerses(bookId, chapter));
@@ -145,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 displayBooks();
             });
+            addTouchListeners(chapterBox);
             booksContainer.appendChild(chapterBox);
         });
         showMessage("Tap here or swipe left to go back", true);
@@ -165,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const verses = getVersesByBookAndChapter(bookId, chapter);
         verses.forEach(verse => {
             const verseNumber = verse.field[3];
-            const verseText = `${verse.field[4]}\n— ${bookNames[bookId]} ${chapter}:${verseNumber}`;
+            const verseText = `${verse.field[4]}\n—${bookNames[bookId]} ${chapter}:${verseNumber}`;
             const verseBox = createBoxElement(verseText);
             verseBox.classList.add('verse-box');
             verseBox.dataset.verse = verseNumber;
@@ -196,23 +188,61 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getVersesByBookAndChapter(bookId, chapter) {
-        return bibleData.filter(verse => 
-            verse.field[1] === parseInt(bookId) && 
+        return bibleData.filter(verse =>
+            verse.field[1] === parseInt(bookId) &&
             verse.field[2] === parseInt(chapter)
         );
     }
 
     function searchHandler() {
         const searchTerm = searchInput.value.toLowerCase();
-        if (searchTerm.length < 4) {
+        if (searchTerm.length < 3) {
             booksContainer.innerHTML = '';
-            resultCount.textContent = 'Type in at least 4 letters to begin search.';
+            resultCount.textContent = 'Enter verse reference or search term to begin search.';
             return;
         }
 
         booksContainer.innerHTML = '';
         setTimeout(() => {
-            const results = bibleData.filter(verse => 
+            // Check if input matches reference pattern with colon
+            const referencePattern = /^([a-z0-9\s]+):(\d+)$/i;
+            const match = searchTerm.match(referencePattern);
+
+            if (match) {
+                const [_, bookChapter, verse] = match;
+                const [bookSearch, chapter] = bookChapter.trim().split(/\s+/);
+
+                // Find matching book including abbreviations
+                const bookId = Object.entries(bookNames).find(([_, name]) => 
+                    name.toLowerCase().startsWith(bookSearch.toLowerCase())
+                )?.[0];
+
+                if (bookId) {
+                    const verses = getVersesByBookAndChapter(bookId, parseInt(chapter));
+                    const targetVerse = verses.find(v => v.field[3] === parseInt(verse));
+
+                    if (targetVerse) {
+                        resultCount.textContent = 'Reference found';
+                        const verseText = targetVerse.field[4];
+                        const fullText = `${verseText}\n—${bookNames[bookId]} ${chapter}:${verse}`;
+                        const resultBox = createBoxElement(fullText);
+                        resultBox.classList.add('result-box');
+                        resultBox.addEventListener('click', () => {
+                            toggleChapters(bookId);
+                            toggleVerses(bookId, chapter, verse);
+                            searchInput.value = '';
+                            resultCount.textContent = '';
+                        });
+                        booksContainer.appendChild(resultBox);
+                        return;
+                    }
+                }
+                resultCount.textContent = 'Reference not found. Try a different format.';
+                return;
+            }
+
+            // Regular word search if not a reference
+            const results = bibleData.filter(verse =>
                 verse.field[4].toLowerCase().includes(searchTerm)
             );
             const highlightTerm = new RegExp(`(${searchTerm})`, 'gi');
@@ -223,8 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const bookName = bookNames[bookId];
                 const chapter = result.field[2];
                 const verseNumber = result.field[3];
-                const verseText = result.field[4].replace(highlightTerm, '$1');
-                const fullText = `${verseText}\n— ${bookName} ${chapter}:${verseNumber}`;
+                const verseText = result.field[4].replace(highlightTerm, '<span class="highlight">$1</span>');
+                const fullText = `${verseText}\n—${bookName} ${chapter}:${verseNumber}`;
                 const resultBox = createBoxElement(fullText);
                 resultBox.classList.add('result-box');
                 resultBox.addEventListener('click', () => {
@@ -237,6 +267,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }, 500);
     }
+
+
 
     function createBoxElement(text) {
         const box = document.createElement('div');
