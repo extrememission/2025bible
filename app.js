@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultCount = document.getElementById('result-count');
     const stickyMessage = document.getElementById('sticky-message');
     const bibleData = [];
-    
+
     const bookNames = {
         1: 'Genesis', 2: 'Exodus', 3: 'Leviticus', 4: 'Numbers', 5: 'Deuteronomy',
         6: 'Joshua', 7: 'Judges', 8: 'Ruth', 9: '1 Samuel', 10: '2 Samuel',
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addTouchListeners(element) {
         let startX, startY;
-        
+
         element.addEventListener('touchstart', (e) => {
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const endY = e.changedTouches[0].clientY;
             const diffX = endX - startX;
             const diffY = endY - startY;
-            
+
             if (Math.abs(diffX) > Math.abs(diffY) && diffX < -50) {
                 if (e.target.classList.contains('verse-box')) {
                     const bookId = e.target.dataset.bookId;
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         return Array.from(chapters).sort((a, b) => a - b);
     }
-    
+
 function toggleVerses(bookId, chapter, targetVerseNumber = null) {
     booksContainer.innerHTML = '';
     const verses = getVersesByBookAndChapter(bookId, chapter);
@@ -129,20 +129,20 @@ function toggleVerses(bookId, chapter, targetVerseNumber = null) {
         const verseText = `${verse.field[4]}\n—${bookNames[bookId]} ${chapter}:${verseNumber}`;
         const verseBox = document.createElement('div');
         verseBox.className = 'box verse-box';
-        
+
         const textDiv = document.createElement('div');
         textDiv.className = 'verse-content';
         textDiv.innerHTML = verseText;
-        
+
         const copyIcon = document.createElement('span');
         copyIcon.innerHTML = '⎘';
         copyIcon.className = 'copy-icon';
-        
+
         copyIcon.addEventListener('click', (e) => {
             e.stopPropagation();
             const parts = verseText.split('\n');
             const formattedText = `${parts[0]}\n—${parts[1].substring(1)}`;
-            
+
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(formattedText)
                     .then(() => {
@@ -154,18 +154,18 @@ function toggleVerses(bookId, chapter, targetVerseNumber = null) {
                 fallbackCopyToClipboard(formattedText);
             }
         });
-        
+
         verseBox.appendChild(textDiv);
         verseBox.appendChild(copyIcon);
         verseBox.dataset.verse = verseNumber;
         verseBox.dataset.bookId = bookId;
         verseBox.dataset.chapter = chapter;
-        
+
         verseBox.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             toggleChapters(bookId);
         });
-        
+
         addTouchListeners(verseBox);
         booksContainer.appendChild(verseBox);
 
