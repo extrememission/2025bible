@@ -77,9 +77,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 const text = parts[0];
                 const reference = parts[1].substring(1);
                 const formattedText = `${text}\n—${reference}`;
-                navigator.clipboard.writeText(formattedText)
-                    .then(() => alert('Verse copied to clipboard!'))
-                    .catch(err => console.error('Error copying verse:', err));
+                
+                function copyToClipboard(text) {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(text)
+                            .then(() => alert('Verse copied to clipboard!'))
+                            .catch(() => {
+                                fallbackCopyToClipboard(text);
+                            });
+                    } else {
+                        fallbackCopyToClipboard(text);
+                    }
+                }
+
+                function fallbackCopyToClipboard(text) {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    
+                    try {
+                        document.execCommand('copy');
+                        alert('Verse copied to clipboard!');
+                    } catch (error) {
+                        alert('Failed to copy verse to clipboard');
+                    } finally {
+                        textArea.remove();
+                    }
+                }
+
+                copyToClipboard(formattedText);
             }
         });
     }
