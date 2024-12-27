@@ -122,6 +122,7 @@ input[type="text"] {
     font-family: "Titillium Web", sans-serif;
     display: block;
     padding: 20px;
+    padding-bottom: 40px;
     margin: 10px 0;
     background-color: black;
     border-radius: 7px;
@@ -144,17 +145,28 @@ input[type="text"] {
     letter-spacing: 0.3em;
 }
 
+.verse-content {
+    padding-bottom: 20px;
+    text-align: center;
+    width: 100%;
+}
+
 .copy-icon {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 8px;
+    bottom: 10px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    cursor: pointer;
+    font-size: 14px;
+    background-color: transparent;
+    border: none;
+    color: #808080;
+    padding: 4px 8px;
 }
 
 .copy-icon:hover {
     opacity: 1;
-}
-
-.verse-content {
-    padding-right: 30px;
+    color: #ffffff;
 }
