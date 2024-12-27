@@ -80,29 +80,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 function copyToClipboard(text) {
                     if (navigator.clipboard && window.isSecureContext) {
-                        return navigator.clipboard.writeText(text);
+                        navigator.clipboard.writeText(text)
+                            .then(() => alert('Verse copied to clipboard!'))
+                            .catch(() => {
+                                fallbackCopyToClipboard(text);
+                            });
                     } else {
-                        const textArea = document.createElement('textarea');
-                        textArea.value = text;
-                        textArea.style.position = 'fixed';
-                        textArea.style.left = '-999999px';
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        
-                        try {
-                            document.execCommand('copy');
-                            textArea.remove();
-                            return Promise.resolve();
-                        } catch (error) {
-                            textArea.remove();
-                            return Promise.reject(error);
-                        }
+                        fallbackCopyToClipboard(text);
                     }
                 }
 
-                copyToClipboard(formattedText)
-                    .then(() => alert('Verse copied to clipboard!'))
-                    .catch(err => alert('Failed to copy verse to clipboard'));
+                function fallbackCopyToClipboard(text) {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    
+                    try {
+                        document.execCommand('copy');
+                        alert('Verse copied to clipboard!');
+                    } catch (error) {
+                        alert('Failed to copy verse to clipboard');
+                    } finally {
+                        textArea.remove();
+                    }
+                }
+
+                copyToClipboard(formattedText);
             }
         });
     }
