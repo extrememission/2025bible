@@ -1,108 +1,122 @@
-:root {
-    --bg-color: #000000;
-    --text-color: #ffffff;
-    --border-color: #333333;
-    --highlight-color: #d4ff00;
-}
-
-[data-theme="light"] {
-    --bg-color: #ffffff;
-    --text-color: #000000;
-    --border-color: #cccccc;
-    --highlight-color: #ffff00;
-}
-
 body {
-    font-family: "Titillium Web", sans-serif;
-    letter-spacing: 0.3em;
-    font-size: large;
-    color: var(--text-color);
-    background: var(--bg-color);
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    user-select: none;
+  font-family: "Titillium Web", sans-serif;
+  font-optical-sizing: auto;
+  letter-spacing: 0.3em;
+  font-size: large;
+  font-style: normal;
+  color: white;
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background: #000000;
+  margin: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+#sticky-message {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  background-color: black;
+  padding: 10px;
+  color: #00ff00;
+  text-shadow: 0 0 10px #00ff00;
+  font-family: "Titillium Web", sans-serif;
+  letter-spacing: 0.3em;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  text-align: center;
+  white-space: pre-line;
+}
+
+.message-link {
+  text-decoration: underline;
+  cursor: pointer;
+  color: #00ff00;
 }
 
 .search-container {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    padding: 10px;
-    background: var(--bg-color);
-    z-index: 100;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  margin: 0;
 }
 
 input[type="text"] {
-    font-family: "Titillium Web", sans-serif;
-    width: calc(100% - 40px);
-    padding: 15px;
-    text-align: center;
-    border-radius: 7px;
-    font-size: 20px;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    border: solid var(--border-color) 1.5px;
-    letter-spacing: 0.3em;
-    outline: none;
+  font-family: "Titillium Web", sans-serif;
+  width: 100%;
+  padding: 15px;
+  text-align: center;
+  border: .5px solid #000000;
+  border-radius: 7px;
+  outline: none;
+  font-size: 20px;
+  font-optical-sizing: auto;
+  font-style: normal;
+  background-color: black;
+  color: white;
+  border: solid gray 1.5px;
+  letter-spacing: 0.3em;
 }
 
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 10px;
-    padding: 60px 10px 10px 10px;
-    width: 100%;
-    box-sizing: border-box;
+#help-link {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
 }
 
-.box {
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 5px;
-    border: 1.5px solid var(--border-color);
-    border-radius: 7px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+#help-link a {
+  font-family: sans-serif;
+  font-size: small;
+  font-style: normal;
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #00000000;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  color: gray;
+  padding-bottom: 25px;
 }
 
-.verse-box {
-    grid-column: 1 / -1;
-    aspect-ratio: auto;
-    padding: 20px;
-    text-align: left;
+#help-link a:hover {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .highlight {
-    text-shadow: 0 0 10px var(--highlight-color);
-    color: var(--highlight-color);
+  text-shadow: 0 0 10px #d4ff00;
+  color: yellow;
+  pointer-events: auto;
 }
 
-#theme-toggle {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 10px;
-    cursor: pointer;
-    background: var(--bg-color);
-    border: 1.5px solid var(--border-color);
-    border-radius: 50%;
-    z-index: 100;
+#app {
+  width: 90%;
+  padding: 10px;
+  margin: 0;
 }
 
-@media (orientation: landscape) {
-    body {
-        transform: rotate(90deg);
-        transform-origin: left top;
-        width: 100vh;
-        height: 100vw;
-        overflow-x: hidden;
-        position: absolute;
-        top: 100%;
-        left: 0;
-    }
+.box, .book-box, .chapter-box, .verse-box, .result-box {
+  font-family: "Titillium Web", sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  margin: 10px 0;
+  background-color: black;
+  border-radius: 7px;
+  text-align: center;
+  cursor: pointer;
+  border: solid gray 1.5px;
 }
