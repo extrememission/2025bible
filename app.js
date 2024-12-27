@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
             bibleData.push(...data.resultset.row);
             searchInput.addEventListener('input', debounce(searchHandler, 500));
             setTimeout(() => {
-                showMessage("Welcome to the Extreme Mission Bible App\nSelect a book, or enter a search term to begin.");
+                showMessage("Welcome to the Extreme Mission Bible App!\nSelect a book, or enter a reference or search term to begin.");
             }, 2000);
         })
         .catch(error => {
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addTouchListeners(bookBox);
             booksContainer.appendChild(bookBox);
         }
-        showMessage("Welcome to the Extreme Mission Bible App\nSelect a book, or enter a search term to begin.");
+        showMessage("Select a book, or enter a reference or search term.");
     }
 
     function addTouchListeners(element) {
