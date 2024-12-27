@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addTouchListeners(bookBox);
             booksContainer.appendChild(bookBox);
         }
-        showMessage("Select a book, or enter a reference or search term.");
+        showMessage("Welcome to the Extreme Mission Bible App!\nSelect a book, or enter a reference or search term to begin.");
     }
 
     function addTouchListeners(element) {
