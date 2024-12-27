@@ -204,24 +204,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     booksContainer.innerHTML = '';
     setTimeout(() => {
-        // Check if input matches reference pattern with colon
-        const referencePattern = /^([123]?\s*[a-z]+):(\d+)$/i;
-        const match = searchTerm.match(referencePattern);
+        // Check if input contains a colon (indicating a reference)
+        if (searchTerm.includes(':')) {
+            // Split on colon to separate book+chapter from verse
+            const [bookChapterPart, versePart] = searchTerm.split(':');
+            const verse = parseInt(versePart);
+            
+            // Split the book+chapter part on the last space before any numbers
+            const matches = bookChapterPart.match(/^(.+?)(?:\s+(\d+))?$/);
+            if (!matches) {
+                resultCount.textContent = 'Reference not found. Try a different format.';
+                return;
+            }
 
-        if (match) {
-            const [_, bookChapter, verse] = match;
-            const [bookSearch, chapter] = bookChapter.trim().split(/\s+(?=\d+$)/);
-
+            const [_, bookPart, chapter = 1] = matches;
+            
             // Find matching book including abbreviations
             const bookId = Object.entries(bookNames).find(([_, name]) => {
                 const searchName = name.toLowerCase().replace(/\s+/g, '');
-                const searchTerm = bookSearch.toLowerCase().replace(/\s+/g, '');
+                const searchTerm = bookPart.toLowerCase().replace(/\s+/g, '');
                 return searchName.startsWith(searchTerm);
             })?.[0];
 
             if (bookId) {
                 const verses = getVersesByBookAndChapter(bookId, parseInt(chapter));
-                const targetVerse = verses.find(v => v.field[3] === parseInt(verse));
+                const targetVerse = verses.find(v => v.field[3] === verse);
 
                 if (targetVerse) {
                     resultCount.textContent = 'Reference found';
@@ -269,9 +276,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, 500);
 }
-
-
-
 
     function createBoxElement(text) {
         const box = document.createElement('div');
