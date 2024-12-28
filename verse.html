@@ -3,7 +3,6 @@
 <head>
     <title>Bible Verse</title>
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
-    <script src="js/bookNames.js"></script>
     <style>
         body {
             font-family: "Titillium Web", sans-serif;
@@ -35,6 +34,7 @@
 <body>
     <div id="verse" class="verse-container"></div>
     <a href="index.html" class="app-link">Open Extreme Mission Bible App</a>
+        <script src="js/bookNames.js"></script>
        <script>
         const params = new URLSearchParams(window.location.search);
         const book = params.get('book');
