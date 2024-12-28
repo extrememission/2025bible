@@ -1,10 +1,28 @@
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga';
+}
+
 body {
   font-family: "Titillium Web", sans-serif;
   font-optical-sizing: auto;
   letter-spacing: 0.3em;
   font-size: large;
   font-style: normal;
-  color: #ffffff;
+  color: white;
   text-align: center;
   min-height: 100vh;
   display: flex;
@@ -29,7 +47,7 @@ body {
   transition: opacity 0.3s ease-in-out;
   text-align: center;
   white-space: pre-line;
-  font-size: 16px !important;
+  font-size: small !important;
   letter-spacing: normal;
 }
 
@@ -91,8 +109,8 @@ input[type="text"] {
 }
 
 .highlight {
-  text-shadow: 0 0 10px #00ff00;
-  color: #00ff00;
+  text-shadow: 0 0 10px #d4ff00;
+  color: yellow;
   pointer-events: auto;
 }
 
@@ -153,19 +171,35 @@ input[type="text"] {
 
 .copy-icon {
   position: absolute;
-  left: 50%;
+  left: calc(50% - 30px);
   transform: translateX(-50%);
   bottom: 10px;
+  opacity: 0.7;
   transition: opacity 0.2s;
   cursor: pointer;
-  font-size: 25px;
+  font-size: 18px !important;
   background-color: transparent;
   border: none;
   color: #ffffff;
   padding: 4px 8px;
 }
 
-.copy-icon:hover {
+.share-icon {
+  position: absolute;
+  left: calc(50% + 30px);
+  transform: translateX(-50%);
+  bottom: 10px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  cursor: pointer;
+  font-size: 18px !important;
+  background-color: transparent;
+  border: none;
+  color: #ffffff;
+  padding: 4px 8px;
+}
+
+.copy-icon:hover, .share-icon:hover {
   opacity: 1;
   color: #00ff00;
 }
