@@ -34,8 +34,8 @@
 <body>
     <div id="verse" class="verse-container"></div>
     <a href="index.html" class="app-link">Open Extreme Mission Bible App</a>
-        <script src="js/bookNames.js"></script>
-       <script>
+    <script src="js/bookNames.js"></script>
+    <script>
         const params = new URLSearchParams(window.location.search);
         const book = params.get('book');
         const chapter = params.get('chapter');
@@ -50,7 +50,6 @@
                     v.field[3] === parseInt(verse)
                 );
                 if (verseData) {
-                    const bookNames = {/* Copy your bookNames object here */};
                     const verseText = verseData.field[4];
                     const reference = `${bookNames[book]} ${chapter}:${verse}`;
                     document.getElementById('verse').innerHTML = 
