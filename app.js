@@ -1,23 +1,28 @@
-const booksContainer = document.getElementById('books');
-const searchInput = document.getElementById('search');
-const resultCount = document.getElementById('result-count');
-const stickyMessage = document.getElementById('sticky-message');
-const bibleData = [];
-const params = new URLSearchParams(window.location.search);
-const book = params.get('book');
-const chapter = params.get('chapter');
-const verse = params.get('verse');
+document.addEventListener('DOMContentLoaded', () => {
+    const booksContainer = document.getElementById('books');
+    const searchInput = document.getElementById('search');
+    const resultCount = document.getElementById('result-count');
+    const stickyMessage = document.getElementById('sticky-message');
+    const bibleData = [];
+
+    const params = new URLSearchParams(window.location.search);
+    const book = params.get('book');
+    const chapter = params.get('chapter');
+    const verse = params.get('verse');
 
     function showMessage(message, hasLink = false) {
         stickyMessage.style.opacity = '0';
         setTimeout(() => {
-            stickyMessage.innerHTML = hasLink ? message.replace('here', '<span class="message-link">here</span>') : message;
+            stickyMessage.innerHTML = hasLink ? 
+                message.replace('here', '<span class="message-link">here</span>') : 
+                message;
             stickyMessage.style.opacity = '1';
         }, 300);
     }
 
     function addTouchListeners(element) {
         let startX, startY;
+
         element.addEventListener('touchstart', (e) => {
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
@@ -28,6 +33,7 @@ const verse = params.get('verse');
             const endY = e.changedTouches[0].clientY;
             const diffX = endX - startX;
             const diffY = endY - startY;
+
             if (Math.abs(diffX) > Math.abs(diffY) && diffX < -50) {
                 if (e.target.classList.contains('verse-box')) {
                     const bookId = e.target.dataset.bookId;
@@ -102,10 +108,12 @@ const verse = params.get('verse');
             const copyIcon = document.createElement('i');
             copyIcon.className = 'material-icons copy-icon';
             copyIcon.textContent = 'content_copy';
+
             copyIcon.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const parts = verseText.split('\n');
                 const formattedText = `${parts[0]}\n—${parts[1].substring(1)}`;
+
                 if (navigator.clipboard && window.isSecureContext) {
                     navigator.clipboard.writeText(formattedText)
                         .then(() => {
@@ -118,29 +126,17 @@ const verse = params.get('verse');
             const shareIcon = document.createElement('i');
             shareIcon.className = 'material-icons share-icon';
             shareIcon.textContent = 'share';
-            shareIcon.addEventListener('click', async (e) => {
+
+            shareIcon.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const url = `${window.location.origin}/verse.html?book=${bookId}&chapter=${chapter}&verse=${verseNumber}`;
-                const parts = verseText.split('\n');
-                const formattedText = `${parts[0]}\n—${parts[1].substring(1)}`;
-                
-                try {
-                    await navigator.share({
-                        title: 'Bible Verse',
-                        text: formattedText,
-                        url: url
-                    });
-                    shareIcon.textContent = 'done';
-                    setTimeout(() => shareIcon.textContent = 'share', 1000);
-                } catch (err) {
-                    console.log('Share failed:', err.message);
-                    if (navigator.clipboard && window.isSecureContext) {
-                        navigator.clipboard.writeText(`${formattedText}\n${url}`)
-                            .then(() => {
-                                shareIcon.textContent = 'done';
-                                setTimeout(() => shareIcon.textContent = 'share', 1000);
-                            });
-                    }
+
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(url)
+                        .then(() => {
+                            shareIcon.textContent = 'done';
+                            setTimeout(() => shareIcon.textContent = 'share', 1000);
+                        });
                 }
             });
 
@@ -155,6 +151,7 @@ const verse = params.get('verse');
                 e.preventDefault();
                 toggleChapters(bookId);
             });
+
             addTouchListeners(verseBox);
             booksContainer.appendChild(verseBox);
 
@@ -163,10 +160,7 @@ const verse = params.get('verse');
                     const verseBoxRect = verseBox.getBoundingClientRect();
                     const scrollTop = window.scrollY || window.pageYOffset;
                     const offsetTop = verseBoxRect.top + scrollTop - 20;
-                    window.scrollTo({
-                        top: offsetTop,
-                        behavior: 'smooth'
-                    });
+                    window.scrollTo({ top: offsetTop, behavior: 'smooth' });
                     const highlightSpan = document.createElement('span');
                     highlightSpan.className = 'highlight';
                     highlightSpan.textContent = verse.field[4];
@@ -179,7 +173,8 @@ const verse = params.get('verse');
 
     function getVersesByBookAndChapter(bookId, chapter) {
         return bibleData.filter(verse =>
-            verse.field[1] === parseInt(bookId) && verse.field[2] === parseInt(chapter)
+            verse.field[1] === parseInt(bookId) &&
+            verse.field[2] === parseInt(chapter)
         );
     }
 
