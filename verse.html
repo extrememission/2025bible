@@ -4,6 +4,12 @@
     <title>Bible Verse</title>
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
     <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
         body {
             font-family: "Titillium Web", sans-serif;
             background: #000000;
@@ -18,16 +24,23 @@
             margin: 0;
         }
         .verse-container {
-            padding: 20px;
-            margin: 20px;
+            padding: 5vh 5vw;
+            margin: 0;
             border: solid gray 1.5px;
             border-radius: 7px;
             white-space: pre-line;
+            width: 90vw;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         .app-link {
             color: #00ff00;
             text-decoration: none;
-            margin-top: 20px;
+            margin-top: 2vh;
+            padding: 2vh 0;
         }
     </style>
 </head>
