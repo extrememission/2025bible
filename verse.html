@@ -24,31 +24,59 @@
             margin: 0;
         }
         .verse-container {
-            padding: 5vh 5vw;
-            margin: 0;
+            padding: 20px;
+            margin: 20px;
             border: solid gray 1.5px;
             border-radius: 7px;
             white-space: pre-line;
-            width: 90vw;
+            width: 80vw;
             height: 80vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
         }
+        .verse-text {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .app-link {
             color: #00ff00;
             text-decoration: none;
-            margin-top: 2vh;
-            padding: 2vh 0;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div id="verse" class="verse-container"></div>
+    <div id="verse" class="verse-container">
+        <div id="verse-text" class="verse-text"></div>
+    </div>
     <a href="index.html" class="app-link">Open Extreme Mission Bible App</a>
     <script src="js/bookNames.js"></script>
     <script>
+        function fitText(element) {
+            const container = element.parentElement;
+            const maxWidth = container.clientWidth * 0.9;
+            const maxHeight = container.clientHeight * 0.9;
+            
+            let fontSize = 1;
+            element.style.fontSize = fontSize + 'px';
+            
+            // Increase font size until text overflows container
+            while (element.scrollHeight <= maxHeight && element.scrollWidth <= maxWidth) {
+                fontSize++;
+                element.style.fontSize = fontSize + 'px';
+            }
+            
+            // Step back one size to ensure fit
+            element.style.fontSize = (fontSize - 1) + 'px';
+        }
+
         const params = new URLSearchParams(window.location.search);
         const book = params.get('book');
         const chapter = params.get('chapter');
@@ -65,8 +93,16 @@
                 if (verseData) {
                     const verseText = verseData.field[4];
                     const reference = `${bookNames[book]} ${chapter}:${verse}`;
-                    document.getElementById('verse').innerHTML = 
+                    document.getElementById('verse-text').innerHTML = 
                         `${verseText}\n—${reference}`;
+                    
+                    // Fit text after content is loaded
+                    fitText(document.getElementById('verse-text'));
+                    
+                    // Refit on window resize
+                    window.addEventListener('resize', () => {
+                        fitText(document.getElementById('verse-text'));
+                    });
                 }
             });
     </script>
