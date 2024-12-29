@@ -53,8 +53,8 @@
     </style>
 </head>
 <body>
-    <div id="verse" class="verse-container">
-        <div id="verse-text" class="verse-text"></div>
+    <div class="verse-container">
+        <div id="verse" class="verse-text"></div>
     </div>
     <a href="index.html" class="app-link">Open Extreme Mission Bible App</a>
     <script src="js/bookNames.js"></script>
@@ -67,13 +67,11 @@
             let fontSize = 1;
             element.style.fontSize = fontSize + 'px';
             
-            // Increase font size until text overflows container
-            while (element.scrollHeight <= maxHeight && element.scrollWidth <= maxWidth) {
+            while (element.scrollHeight <= maxHeight && element.scrollWidth <= maxWidth && fontSize < 300) {
                 fontSize++;
                 element.style.fontSize = fontSize + 'px';
             }
             
-            // Step back one size to ensure fit
             element.style.fontSize = (fontSize - 1) + 'px';
         }
 
@@ -93,15 +91,13 @@
                 if (verseData) {
                     const verseText = verseData.field[4];
                     const reference = `${bookNames[book]} ${chapter}:${verse}`;
-                    document.getElementById('verse-text').innerHTML = 
+                    document.getElementById('verse').innerHTML = 
                         `${verseText}\n—${reference}`;
                     
-                    // Fit text after content is loaded
-                    fitText(document.getElementById('verse-text'));
+                    fitText(document.getElementById('verse'));
                     
-                    // Refit on window resize
                     window.addEventListener('resize', () => {
-                        fitText(document.getElementById('verse-text'));
+                        fitText(document.getElementById('verse'));
                     });
                 }
             });
