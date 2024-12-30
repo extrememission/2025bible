@@ -34,45 +34,82 @@
             text-decoration: none;
             margin-top: 20px;
         }
+        .error-message {
+            color: red;
+            margin: 20px;
+        }
     </style>
 </head>
 <body>
     <div id="verse" class="verse-container"></div>
+    <div id="error" class="error-message"></div>
     <a href="index.html" class="app-link">Open Extreme Mission Bible App</a>
     <script src="js/bookNames.js"></script>
     <script>
+        // Function to display errors
+        function showError(message) {
+            console.error(message);
+            document.getElementById('error').textContent = message;
+        }
+
+        // Check if required scripts are loaded
+        if (typeof bookNames === 'undefined') {
+            showError('Error: bookNames.js is not loaded properly');
+        }
+
         const params = new URLSearchParams(window.location.search);
         const book = params.get('book');
         const chapter = params.get('chapter');
         const verse = params.get('verse');
 
+        // Validate URL parameters
+        if (!book || !chapter || !verse) {
+            showError('Error: Missing required URL parameters (book, chapter, or verse)');
+        }
+
         fetch('data/kjv.json')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                if (!data || !data.resultset || !data.resultset.row) {
+                    throw new Error('Invalid JSON structure');
+                }
+
                 const verseData = data.resultset.row.find(v => 
                     v.field[1] === parseInt(book) && 
                     v.field[2] === parseInt(chapter) && 
                     v.field[3] === parseInt(verse)
                 );
-                if (verseData) {
-                    const verseText = verseData.field[4];
-                    const reference = `${bookNames[book]} ${chapter}:${verse}`;
-                    document.getElementById('verse').innerHTML = 
-                        `${verseText}\n—${reference}`;
-                    
-                    // Add auto-sizing after verse is loaded
-                    const verseElement = document.getElementById('verse');
-                    let fontSize = 1;
-                    verseElement.style.fontSize = fontSize + 'px';
-                    
-                    while (verseElement.scrollHeight <= verseElement.clientHeight * 0.9 && 
-                           verseElement.scrollWidth <= verseElement.clientWidth * 0.9 && 
-                           fontSize < 200) {
-                        fontSize++;
-                        verseElement.style.fontSize = fontSize + 'px';
-                    }
-                    verseElement.style.fontSize = (fontSize - 1) + 'px';
+
+                if (!verseData) {
+                    throw new Error(`Verse not found: ${book} ${chapter}:${verse}`);
                 }
+
+                const verseText = verseData.field[4];
+                const reference = `${bookNames[book]} ${chapter}:${verse}`;
+                document.getElementById('verse').innerHTML = 
+                    `${verseText}\n—${reference}`;
+                
+                // Add auto-sizing after verse is loaded
+                const verseElement = document.getElementById('verse');
+                let fontSize = 1;
+                verseElement.style.fontSize = fontSize + 'px';
+                
+                while (verseElement.scrollHeight <= verseElement.clientHeight * 0.9 && 
+                       verseElement.scrollWidth <= verseElement.clientWidth * 0.9 && 
+                       fontSize < 200) {
+                    fontSize++;
+                    verseElement.style.fontSize = fontSize + 'px';
+                }
+                verseElement.style.fontSize = (fontSize - 1) + 'px';
+            })
+            .catch(error => {
+                showError(`Error: ${error.message}`);
+                console.log('Full error object:', error);
             });
     </script>
 </body>
