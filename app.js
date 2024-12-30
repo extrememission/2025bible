@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultCount = document.getElementById('result-count');
     const stickyMessage = document.getElementById('sticky-message');
     const bibleData = [];
-
     const params = new URLSearchParams(window.location.search);
     const book = params.get('book');
     const chapter = params.get('chapter');
@@ -13,16 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function showMessage(message, hasLink = false) {
         stickyMessage.style.opacity = '0';
         setTimeout(() => {
-            stickyMessage.innerHTML = hasLink ? 
-                message.replace('here', '<span class="message-link">here</span>') : 
-                message;
+            stickyMessage.innerHTML = hasLink ? message.replace('here', 'here') : message;
             stickyMessage.style.opacity = '1';
         }, 300);
     }
 
     function addTouchListeners(element) {
         let startX, startY;
-
         element.addEventListener('touchstart', (e) => {
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
@@ -33,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const endY = e.changedTouches[0].clientY;
             const diffX = endX - startX;
             const diffY = endY - startY;
-
             if (Math.abs(diffX) > Math.abs(diffY) && diffX < -50) {
                 if (e.target.classList.contains('verse-box')) {
                     const bookId = e.target.dataset.bookId;
@@ -63,6 +58,16 @@ document.addEventListener('DOMContentLoaded', () => {
         showMessage("Welcome to the Extreme Mission Bible App!\nSelect a book, or enter a reference or search term to begin.");
     }
 
+    function getChaptersByBookId(bookId) {
+        const chapters = new Set();
+        bibleData.forEach(verse => {
+            if (verse.field[1] === parseInt(bookId)) {
+                chapters.add(verse.field[2]);
+            }
+        });
+        return Array.from(chapters).sort((a, b) => a - b);
+    }
+
     function toggleChapters(bookId) {
         booksContainer.innerHTML = '';
         const chapters = getChaptersByBookId(bookId);
@@ -82,16 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showMessage("Tap here or swipe left to go back", true);
     }
 
-    function getChaptersByBookId(bookId) {
-        const chapters = new Set();
-        bibleData.forEach(verse => {
-            if (verse.field[1] === parseInt(bookId)) {
-                chapters.add(verse.field[2]);
-            }
-        });
-        return Array.from(chapters).sort((a, b) => a - b);
-    }
-
     function toggleVerses(bookId, chapter, targetVerseNumber = null) {
         booksContainer.innerHTML = '';
         const verses = getVersesByBookAndChapter(bookId, chapter);
@@ -100,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const verseText = `${verse.field[4]}\n—${bookNames[bookId]} ${chapter}:${verseNumber}`;
             const verseBox = document.createElement('div');
             verseBox.className = 'box verse-box';
-
             const textDiv = document.createElement('div');
             textDiv.className = 'verse-content';
             textDiv.innerHTML = verseText;
@@ -108,12 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const copyIcon = document.createElement('i');
             copyIcon.className = 'material-icons copy-icon';
             copyIcon.textContent = 'content_copy';
-
             copyIcon.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const parts = verseText.split('\n');
                 const formattedText = `${parts[0]}\n—${parts[1].substring(1)}`;
-
                 if (navigator.clipboard && window.isSecureContext) {
                     navigator.clipboard.writeText(formattedText)
                         .then(() => {
@@ -126,17 +118,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const shareIcon = document.createElement('i');
             shareIcon.className = 'material-icons share-icon';
             shareIcon.textContent = 'share';
-
-            shareIcon.addEventListener('click', (e) => {
+            shareIcon.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                const url = `${window.location.origin}/verse.html?book=${bookId}&chapter=${chapter}&verse=${verseNumber}`;
-
-                if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(url)
-                        .then(() => {
-                            shareIcon.textContent = 'done';
-                            setTimeout(() => shareIcon.textContent = 'share', 1000);
+                const parts = verseText.split('\n');
+                const formattedText = `${parts[0]}\n—${parts[1].substring(1)}`;
+                
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            text: formattedText
                         });
+                        shareIcon.textContent = 'done';
+                        setTimeout(() => shareIcon.textContent = 'share', 1000);
+                    } catch (err) {
+                        console.error('Error sharing:', err);
+                    }
+                } else {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(formattedText)
+                            .then(() => {
+                                shareIcon.textContent = 'done';
+                                setTimeout(() => shareIcon.textContent = 'share', 1000);
+                            });
+                    }
                 }
             });
 
@@ -146,12 +150,10 @@ document.addEventListener('DOMContentLoaded', () => {
             verseBox.dataset.verse = verseNumber;
             verseBox.dataset.bookId = bookId;
             verseBox.dataset.chapter = chapter;
-
             verseBox.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 toggleChapters(bookId);
             });
-
             addTouchListeners(verseBox);
             booksContainer.appendChild(verseBox);
 
@@ -232,13 +234,12 @@ document.addEventListener('DOMContentLoaded', () => {
             );
             const highlightTerm = new RegExp(`(${searchTerm})`, 'gi');
             resultCount.textContent = `Results: ${results.length}`;
-
             results.forEach(result => {
                 const bookId = result.field[1];
                 const bookName = bookNames[bookId];
                 const chapter = result.field[2];
                 const verseNumber = result.field[3];
-                const verseText = result.field[4].replace(highlightTerm, '<span class="highlight">$1</span>');
+                const verseText = result.field[4].replace(highlightTerm, '$1');
                 const fullText = `${verseText}\n—${bookName} ${chapter}:${verseNumber}`;
                 const resultBox = createBoxElement(fullText);
                 resultBox.classList.add('result-box');
