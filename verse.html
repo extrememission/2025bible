@@ -41,21 +41,6 @@
     <a href="index.html" class="app-link">Open Extreme Mission Bible App</a>
     <script src="js/bookNames.js"></script>
     <script>
-        function fitText(element) {
-            const maxWidth = element.clientWidth * 0.9;
-            const maxHeight = element.clientHeight * 0.9;
-            
-            let fontSize = 1;
-            element.style.fontSize = fontSize + 'px';
-            
-            while (element.scrollHeight <= maxHeight && element.scrollWidth <= maxWidth && fontSize < 300) {
-                fontSize++;
-                element.style.fontSize = fontSize + 'px';
-            }
-            
-            element.style.fontSize = (fontSize - 1) + 'px';
-        }
-
         const params = new URLSearchParams(window.location.search);
         const book = params.get('book');
         const chapter = params.get('chapter');
@@ -75,11 +60,18 @@
                     document.getElementById('verse').innerHTML = 
                         `${verseText}\n—${reference}`;
                     
-                    fitText(document.getElementById('verse'));
+                    // Add auto-sizing after verse is loaded
+                    const verseElement = document.getElementById('verse');
+                    let fontSize = 1;
+                    verseElement.style.fontSize = fontSize + 'px';
                     
-                    window.addEventListener('resize', () => {
-                        fitText(document.getElementById('verse'));
-                    });
+                    while (verseElement.scrollHeight <= verseElement.clientHeight * 0.9 && 
+                           verseElement.scrollWidth <= verseElement.clientWidth * 0.9 && 
+                           fontSize < 200) {
+                        fontSize++;
+                        verseElement.style.fontSize = fontSize + 'px';
+                    }
+                    verseElement.style.fontSize = (fontSize - 1) + 'px';
                 }
             });
     </script>
