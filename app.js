@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             shareIcon.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const url = `${window.location.origin}/verse.html?book=${bookId}&chapter=${chapter}&verse=${verseNumber}`;
+                const url = `${window.location.origin}verse.html?book=${bookId}&chapter=${chapter}&verse=${verseNumber}`;
 
                 if (navigator.clipboard && window.isSecureContext) {
                     navigator.clipboard.writeText(url)
