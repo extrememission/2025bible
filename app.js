@@ -5,6 +5,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const stickyMessage = document.getElementById('sticky-message');
     const bibleData = [];
 
+    const params = new URLSearchParams(window.location.search);
+    const book = params.get('book');
+    const chapter = params.get('chapter');
+    const verse = params.get('verse');
+
     function showMessage(message, hasLink = false) {
         stickyMessage.style.opacity = '0';
         setTimeout(() => {
@@ -15,21 +20,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     }
 
-    displayBooks();
+    function addTouchListeners(element) {
+        let startX, startY;
 
-    fetch('data/kjv.json')
-        .then(response => response.json())
-        .then(data => {
-            bibleData.push(...data.resultset.row);
-            searchInput.addEventListener('input', debounce(searchHandler, 500));
-            setTimeout(() => {
-                showMessage("Welcome to the Extreme Mission Bible App!\nSelect a book, or enter a reference or search term to begin.");
-            }, 2000);
-        })
-        .catch(error => {
-            console.error('Error fetching Bible data:', error);
-            resultCount.textContent = 'Error loading data. Please try again later.';
-        });
+        element.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, { passive: false });
+
+        element.addEventListener('touchend', (e) => {
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            const diffX = endX - startX;
+            const diffY = endY - startY;
+
+            if (Math.abs(diffX) > Math.abs(diffY) && diffX < -50) {
+                if (e.target.classList.contains('verse-box')) {
+                    const bookId = e.target.dataset.bookId;
+                    toggleChapters(bookId);
+                } else if (e.target.classList.contains('chapter-box')) {
+                    displayBooks();
+                }
+            }
+        }, { passive: false });
+    }
 
     function displayBooks() {
         booksContainer.innerHTML = '';
@@ -47,92 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
             booksContainer.appendChild(bookBox);
         }
         showMessage("Welcome to the Extreme Mission Bible App!\nSelect a book, or enter a reference or search term to begin.");
-    }
-
-    function addTouchListeners(element) {
-        element.addEventListener('touchstart', handleTouchStart, { passive: false });
-        element.addEventListener('touchend', handleTouchEnd, { passive: false });
-        element.addEventListener('click', handleClick, { passive: false });
-        element.addEventListener('dblclick', (e) => {
-            if (e.target.classList.contains('verse-box')) {
-                const verseText = e.target.innerText;
-                const parts = verseText.split('\n');
-                const text = parts[0];
-                const reference = parts[1].substring(1);
-                const formattedText = `${text}\n—${reference}`;
-                
-                function copyToClipboard(text) {
-                    if (navigator.clipboard && window.isSecureContext) {
-                        navigator.clipboard.writeText(text)
-                            .then(() => alert('Verse copied to clipboard!'))
-                            .catch(() => {
-                                fallbackCopyToClipboard(text);
-                            });
-                    } else {
-                        fallbackCopyToClipboard(text);
-                    }
-                }
-
-                function fallbackCopyToClipboard(text) {
-                    const textArea = document.createElement('textarea');
-                    textArea.value = text;
-                    textArea.style.position = 'fixed';
-                    textArea.style.left = '-999999px';
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    
-                    try {
-                        document.execCommand('copy');
-                        alert('Verse copied to clipboard!');
-                    } catch (error) {
-                        alert('Failed to copy verse to clipboard');
-                    } finally {
-                        textArea.remove();
-                    }
-                }
-
-                copyToClipboard(formattedText);
-            }
-        });
-    }
-
-    let startX, startY;
-    let touchTimer;
-
-    function handleTouchStart(e) {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        touchTimer = setTimeout(() => {
-            handleSingleClick(e.target);
-        }, 500);
-    }
-
-    function handleTouchEnd(e) {
-        clearTimeout(touchTimer);
-        const endX = e.changedTouches[0].clientX;
-        const endY = e.changedTouches[0].clientY;
-        const diffX = endX - startX;
-        const diffY = endY - startY;
-        if (Math.abs(diffX) > Math.abs(diffY) && diffX < -50) {
-            const target = e.target;
-            if (target.classList.contains('verse-box')) {
-                const bookId = target.dataset.bookId;
-                toggleChapters(bookId);
-            } else if (target.classList.contains('chapter-box')) {
-                displayBooks();
-            }
-        }
-    }
-
-    function handleClick(e) {
-        const target = e.target;
-        if (target.classList.contains('verse-box')) {
-            handleSingleClick(target);
-        }
-    }
-
-    function handleSingleClick(target) {
-        // Single-click functionality removed as requested
     }
 
     function toggleChapters(bookId) {
@@ -170,15 +98,60 @@ document.addEventListener('DOMContentLoaded', () => {
         verses.forEach(verse => {
             const verseNumber = verse.field[3];
             const verseText = `${verse.field[4]}\n—${bookNames[bookId]} ${chapter}:${verseNumber}`;
-            const verseBox = createBoxElement(verseText);
-            verseBox.classList.add('verse-box');
+            const verseBox = document.createElement('div');
+            verseBox.className = 'box verse-box';
+
+            const textDiv = document.createElement('div');
+            textDiv.className = 'verse-content';
+            textDiv.innerHTML = verseText;
+
+            const copyIcon = document.createElement('i');
+            copyIcon.className = 'material-icons copy-icon';
+            copyIcon.textContent = 'content_copy';
+
+            copyIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const parts = verseText.split('\n');
+                const formattedText = `${parts[0]}\n—${parts[1].substring(1)}`;
+
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(formattedText)
+                        .then(() => {
+                            copyIcon.textContent = 'done';
+                            setTimeout(() => copyIcon.textContent = 'content_copy', 1000);
+                        });
+                }
+            });
+
+            const shareIcon = document.createElement('i');
+            shareIcon.className = 'material-icons share-icon';
+            shareIcon.textContent = 'share';
+
+            shareIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const url = `${window.location.origin}/verse.html?book=${bookId}&chapter=${chapter}&verse=${verseNumber}`;
+
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(url)
+                        .then(() => {
+                            shareIcon.textContent = 'done';
+                            setTimeout(() => shareIcon.textContent = 'share', 1000);
+                        });
+                }
+            });
+
+            verseBox.appendChild(textDiv);
+            verseBox.appendChild(copyIcon);
+            verseBox.appendChild(shareIcon);
             verseBox.dataset.verse = verseNumber;
             verseBox.dataset.bookId = bookId;
             verseBox.dataset.chapter = chapter;
+
             verseBox.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 toggleChapters(bookId);
             });
+
             addTouchListeners(verseBox);
             booksContainer.appendChild(verseBox);
 
@@ -191,12 +164,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const highlightSpan = document.createElement('span');
                     highlightSpan.className = 'highlight';
                     highlightSpan.textContent = verse.field[4];
-                    const verseBoxContent = verseBox.innerHTML.split('\n')[1];
-                    verseBox.innerHTML = `${highlightSpan.outerHTML}\n${verseBoxContent}`;
+                    textDiv.innerHTML = `${highlightSpan.outerHTML}\n—${bookNames[bookId]} ${chapter}:${verseNumber}`;
                 }, 100);
             }
         });
-        showMessage("Double click a verse to copy it to the clipboard.\nTap here or swipe left to go back", true);
+        showMessage("Tap the icons to copy or share a verse.\nTap here or swipe left to go back", true);
     }
 
     function getVersesByBookAndChapter(bookId, chapter) {
@@ -219,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (searchTerm.includes(':')) {
                 const [bookChapterPart, versePart] = searchTerm.split(':');
                 const verse = parseInt(versePart);
-                
                 const matches = bookChapterPart.match(/^(.+?)(?:\s+(\d+))?$/);
                 if (!matches) {
                     resultCount.textContent = 'Reference not found. Try a different format.';
@@ -227,7 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const [_, bookPart, chapter = 1] = matches;
-                
                 const bookId = Object.entries(bookNames).find(([_, name]) => {
                     const searchName = name.toLowerCase().replace(/\s+/g, '');
                     const searchTerm = bookPart.toLowerCase().replace(/\s+/g, '');
@@ -237,7 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (bookId) {
                     const verses = getVersesByBookAndChapter(bookId, parseInt(chapter));
                     const targetVerse = verses.find(v => v.field[3] === verse);
-
                     if (targetVerse) {
                         resultCount.textContent = 'Reference found';
                         const verseText = targetVerse.field[4];
@@ -298,6 +267,33 @@ document.addEventListener('DOMContentLoaded', () => {
             timeout = setTimeout(() => func(...args), delay);
         };
     }
+
+    // Initialize the app
+    if (book && chapter && verse) {
+        fetch('data/kjv.json')
+            .then(response => response.json())
+            .then(data => {
+                bibleData.push(...data.resultset.row);
+                toggleChapters(book);
+                toggleVerses(book, chapter, verse);
+            });
+    } else {
+        displayBooks();
+    }
+
+    fetch('data/kjv.json')
+        .then(response => response.json())
+        .then(data => {
+            bibleData.push(...data.resultset.row);
+            searchInput.addEventListener('input', debounce(searchHandler, 500));
+            setTimeout(() => {
+                showMessage("Welcome to the Extreme Mission Bible App!\nSelect a book, or enter a reference or search term to begin.");
+            }, 2000);
+        })
+        .catch(error => {
+            console.error('Error fetching Bible data:', error);
+            resultCount.textContent = 'Error loading data. Please try again later.';
+        });
 
     searchInput.addEventListener('input', () => {
         if (searchInput.value.length > 0) {
