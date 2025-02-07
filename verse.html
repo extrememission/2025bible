@@ -38,11 +38,23 @@
             color: red;
             margin: 20px;
         }
+        .share-button {
+            background-color: #00ff00;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-family: "Titillium Web", sans-serif;
+            font-size: 16px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <div id="verse" class="verse-container"></div>
     <div id="error" class="error-message"></div>
+    <button onclick="copyAndOpenUrl()" class="share-button">Share Verse</button>
     <a href="index.html" class="app-link">Open Extreme Mission Bible App</a>
     <script src="js/bookNames.js"></script>
     <script>
@@ -51,6 +63,19 @@
         function showError(message) {
             console.error(message);
             document.getElementById('error').textContent = message;
+        }
+
+        function copyAndOpenUrl() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    console.log('URL copied to clipboard');
+                    window.open(url, '_blank');
+                })
+                .catch(err => {
+                    console.error('Failed to copy URL: ', err);
+                    showError('Failed to copy URL. Please try again.');
+                });
         }
 
         if (typeof bookNames === 'undefined') {
