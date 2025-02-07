@@ -46,6 +46,8 @@
     <a href="index.html" class="app-link">Open Extreme Mission Bible App</a>
     <script src="js/bookNames.js"></script>
     <script>
+        console.log('Script started');
+
         // Function to display errors
         function showError(message) {
             console.error(message);
@@ -55,12 +57,16 @@
         // Check if required scripts are loaded
         if (typeof bookNames === 'undefined') {
             showError('Error: bookNames.js is not loaded properly');
+        } else {
+            console.log('bookNames loaded successfully');
         }
 
         const params = new URLSearchParams(window.location.search);
         const book = params.get('book');
         const chapter = params.get('chapter');
         const verse = params.get('verse');
+
+        console.log('URL parameters:', { book, chapter, verse });
 
         // Validate URL parameters
         if (!book || !chapter || !verse) {
@@ -69,12 +75,14 @@
 
         fetch('data/kjv.json')
             .then(response => {
+                console.log('Fetch response status:', response.status);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
+                console.log('Data loaded:', data);
                 if (!data || !data.resultset || !data.resultset.row) {
                     throw new Error('Invalid JSON structure');
                 }
@@ -85,14 +93,17 @@
                     v.field[3] === parseInt(verse)
                 );
 
+                console.log('Verse data found:', verseData);
+
                 if (!verseData) {
                     throw new Error(`Verse not found: ${book} ${chapter}:${verse}`);
                 }
 
                 const verseText = verseData.field[4];
                 const reference = `${bookNames[book]} ${chapter}:${verse}`;
-                document.getElementById('verse').innerHTML = 
-                    `${verseText}\n—${reference}`;
+                const content = `${verseText}\n—${reference}`;
+                console.log('Content to be set:', content);
+                document.getElementById('verse').innerHTML = content;
                 
                 // Add auto-sizing after verse is loaded
                 const verseElement = document.getElementById('verse');
@@ -106,6 +117,7 @@
                     verseElement.style.fontSize = fontSize + 'px';
                 }
                 verseElement.style.fontSize = (fontSize - 1) + 'px';
+                console.log('Final font size:', fontSize - 1);
             })
             .catch(error => {
                 showError(`Error: ${error.message}`);
