@@ -48,13 +48,11 @@
     <script>
         console.log('Script started');
 
-        // Function to display errors
         function showError(message) {
             console.error(message);
             document.getElementById('error').textContent = message;
         }
 
-        // Check if required scripts are loaded
         if (typeof bookNames === 'undefined') {
             showError('Error: bookNames.js is not loaded properly');
         } else {
@@ -68,7 +66,6 @@
 
         console.log('URL parameters:', { book, chapter, verse });
 
-        // Validate URL parameters
         if (!book || !chapter || !verse) {
             showError('Error: Missing required URL parameters (book, chapter, or verse)');
         }
@@ -105,19 +102,26 @@
                 console.log('Content to be set:', content);
                 document.getElementById('verse').innerHTML = content;
                 
-                // Add auto-sizing after verse is loaded
+                // Modified auto-sizing function
                 const verseElement = document.getElementById('verse');
-                let fontSize = 1;
+                let fontSize = 16; // Start with a reasonable font size
                 verseElement.style.fontSize = fontSize + 'px';
                 
-                while (verseElement.scrollHeight <= verseElement.clientHeight * 0.9 && 
-                       verseElement.scrollWidth <= verseElement.clientWidth * 0.9 && 
-                       fontSize < 200) {
+                function isOverflowing() {
+                    return verseElement.scrollHeight > verseElement.clientHeight ||
+                           verseElement.scrollWidth > verseElement.clientWidth;
+                }
+
+                while (!isOverflowing() && fontSize < 200) {
                     fontSize++;
                     verseElement.style.fontSize = fontSize + 'px';
                 }
-                verseElement.style.fontSize = (fontSize - 1) + 'px';
-                console.log('Final font size:', fontSize - 1);
+
+                // Step back to the last non-overflowing size
+                fontSize--;
+                verseElement.style.fontSize = fontSize + 'px';
+
+                console.log('Final font size:', fontSize);
             })
             .catch(error => {
                 showError(`Error: ${error.message}`);
