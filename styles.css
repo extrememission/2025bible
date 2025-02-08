@@ -33,6 +33,11 @@ body {
     font-feature-settings: 'liga';
 }
 
+.material-icons + .material-icons {
+  margin-left: 10px;
+}
+
+
 .search-container {
     display: flex;
     flex-direction: row;
