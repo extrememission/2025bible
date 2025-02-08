@@ -128,17 +128,22 @@ document.addEventListener('DOMContentLoaded', () => {
             shareIcon.textContent = 'share';
 
             shareIcon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const url = `${window.location.origin}/verse.html?book=${bookId}&chapter=${chapter}&verse=${verseNumber}`;
+    e.stopPropagation();
+    const url = `${window.location.origin}/verse.html?book=${bookId}&chapter=${chapter}&verse=${verseNumber}`;
 
-                if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(url)
-                        .then(() => {
-                            shareIcon.textContent = 'done';
-                            setTimeout(() => shareIcon.textContent = 'share', 1000);
-                        });
-                }
+    // Open the URL in a new tab
+    window.open(url, '_blank');
+
+    // Optionally, you can still copy the URL to clipboard
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url)
+            .then(() => {
+                shareIcon.textContent = 'done';
+                setTimeout(() => shareIcon.textContent = 'share', 1000);
             });
+    }
+});
+
 
             verseBox.appendChild(textDiv);
             verseBox.appendChild(copyIcon);
