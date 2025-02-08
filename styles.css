@@ -140,7 +140,6 @@ input[type="text"] {
 .verse-box:first-line, .result-box:first-line {
     text-align: center;
     display: block;
-    margin-bottom: 10px;
     letter-spacing: 0.3em;
 }
 
