@@ -30,9 +30,11 @@
             justify-content: center;
         }
         .app-link {
-            color: #00ff00;
+            color: gray;
             text-decoration: none;
-            margin-top: 0; /* Remove the top margin */
+            margin-top: -15px;
+            position: relative;
+            z-index: 1; /* Ensure the link appears above the container if they overlap */
         }
         .error-message {
             color: red;
