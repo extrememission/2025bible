@@ -38,33 +38,11 @@
             color: red;
             margin: 20px;
         }
-        .share-button, .open-link {
-            background-color: #00ff00;
-            color: black;
-            border: none;
-            padding: 10px 20px;
-            margin-top: 20px;
-            cursor: pointer;
-            font-family: "Titillium Web", sans-serif;
-            font-size: 16px;
-            border-radius: 5px;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .button-container {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
     </style>
 </head>
 <body>
     <div id="verse" class="verse-container"></div>
     <div id="error" class="error-message"></div>
-    <div class="button-container">
-        <button onclick="copyUrl()" class="share-button">Copy Link</button>
-        <a id="openLink" href="#" target="_blank" class="open-link">Open in New Tab</a>
-    </div>
     <a href="index.html" class="app-link">Open Extreme Mission Bible App</a>
     <script src="js/bookNames.js"></script>
     <script>
@@ -74,23 +52,6 @@
             console.error(message);
             document.getElementById('error').textContent = message;
         }
-
-        function copyUrl() {
-            const url = window.location.href;
-            navigator.clipboard.writeText(url)
-                .then(() => {
-                    console.log('URL copied to clipboard');
-                    showError('Link copied to clipboard!');
-                    setTimeout(() => showError(''), 2000); // Clear message after 2 seconds
-                })
-                .catch(err => {
-                    console.error('Failed to copy URL: ', err);
-                    showError('Failed to copy URL. Please try again.');
-                });
-        }
-
-        // Set the href for the "Open in New Tab" link
-        document.getElementById('openLink').href = window.location.href;
 
         if (typeof bookNames === 'undefined') {
             showError('Error: bookNames.js is not loaded properly');
@@ -140,6 +101,9 @@
                 const content = `${verseText}\n—${reference}`;
                 console.log('Content to be set:', content);
                 document.getElementById('verse').innerHTML = content;
+
+                // Set the document title with the verse reference
+                document.title = reference;
                 
                 // Modified auto-sizing function
                 const verseElement = document.getElementById('verse');
