@@ -40,19 +40,73 @@
             color: red;
             margin: 20px;
         }
+        #spinner-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #loading-text {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <div id="verse" class="verse-container"></div>
+    <div id="spinner-container">
+        <div id="spinner"></div>
+        <div id="loading-text">LOADING...</div>
+    </div>
+    <div id="verse" class="verse-container" style="display: none;"></div>
     <div id="error" class="error-message"></div>
     <a href="index.html" class="app-link">Open Extreme Mission Bible App</a>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
     <script src="js/bookNames.js"></script>
     <script>
         console.log('Script started');
 
+        // Spinner options
+        var opts = {
+            lines: 13, // The number of lines to draw
+            length: 38, // The length of each line
+            width: 17, // The line thickness
+            radius: 45, // The radius of the inner circle
+            scale: 1, // Scales overall size of the spinner
+            corners: 1, // Corner roundness (0..1)
+            color: '#fff', // CSS color or array of colors
+            fadeColor: 'transparent', // CSS color or array of colors
+            opacity: 0.25, // Opacity of the lines
+            rotate: 0, // The rotation offset
+            direction: 1, // 1: clockwise, -1: counterclockwise
+            speed: 1, // Rounds per second
+            trail: 60, // Afterglow percentage
+            fps: 20, // Frames per second when using setTimeout() as a fallback for CSS
+            zIndex: 2e9, // The z-index (defaults to 2000000000)
+            className: 'spinner', // The CSS class to assign to the spinner
+            top: '50%', // Top position relative to parent
+            left: '50%', // Left position relative to parent
+            shadow: false, // Whether to render a shadow
+            hwaccel: false, // Whether to use hardware acceleration
+            position: 'absolute' // Element positioning
+        }
+
+        var target = document.getElementById('spinner');
+        var spinner = new Spinner(opts).spin(target);
+
+        // Function to show/hide elements
+        function show(elementId) {
+            document.getElementById(elementId).style.display = 'flex';
+        }
+
+        function hide(elementId) {
+            document.getElementById(elementId).style.display = 'none';
+        }
+
         function showError(message) {
             console.error(message);
             document.getElementById('error').textContent = message;
+            hide('spinner-container'); // Hide spinner on error
         }
 
         if (typeof bookNames === 'undefined') {
@@ -127,6 +181,9 @@
                 verseElement.style.fontSize = fontSize + 'px';
 
                 console.log('Final font size:', fontSize);
+
+                hide('spinner-container'); // Hide spinner after content loads
+                show('verse'); // Show the verse container
             })
             .catch(error => {
                 showError(`Error: ${error.message}`);
