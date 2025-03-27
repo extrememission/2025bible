@@ -144,4 +144,37 @@ input[type="text"] {
 
 .verse-content {
     padding-bottom: 20px;
-    text-align: ce
+    text-align: center;
+}
+
+#books {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 0 auto;
+    max-width: 600px;
+}
+
+#books:has(.book-box) {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 5px;
+}
+
+.book-box {
+    min-height: 35px;
+    padding: 5px;
+    margin: 0;
+    font-size: 20px;
+    font-family: 'Six Caps', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    letter-spacing: 0.1em;
+}
+
+.chapter-box, .verse-box {
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+}
