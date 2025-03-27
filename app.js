@@ -61,6 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const bookId = (index + 1).toString();
             const bookBox = createBoxElement(abbr);
             bookBox.classList.add('book-box');
+            if (parseInt(bookId) >= 40) { // Matthew (40) through Revelation
+                bookBox.classList.add('new-testament');
+            }
             bookBox.dataset.bookId = bookId;
             bookBox.addEventListener('click', () => toggleChapters(bookId));
             bookBox.addEventListener('contextmenu', (e) => {
@@ -70,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addTouchListeners(bookBox);
             booksContainer.appendChild(bookBox);
         });
-        showMessage("Welcome to the Extreme Mission Bible App!\nSelect a book, or enter a reference or search term to begin.");
+        stickyMessage.style.opacity = '0';
     }
 
     function toggleChapters(bookId) {
@@ -89,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addTouchListeners(chapterBox);
             booksContainer.appendChild(chapterBox);
         });
-        showMessage("Tap here or swipe left to go back", true);
+        showMessage('<span class="message-link">TAP HERE</span> OR SWIPE LEFT TO GO BACK', false);
     }
 
     function getChaptersByBookId(bookId) {
@@ -183,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 100);
             }
         });
-        showMessage("Tap the icons to copy or share a verse.\nTap here or swipe left to go back", true);
+        showMessage("Tap the icons to copy or share a verse.\n<span class=\"message-link\">TAP HERE</span> OR SWIPE LEFT TO GO BACK", false);
     }
 
     function getVersesByBookAndChapter(bookId, chapter) {
@@ -301,10 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             bibleData.push(...data.resultset.row);
             searchInput.addEventListener('input', debounce(searchHandler, 500));
-            setTimeout(() => {
-                showMessage("Welcome to the Extreme Mission Bible App!\nSelect a book, or enter a reference or search term to begin.");
-            }, 2000);
-        })
+            })
         .catch(error => {
             console.error('Error fetching Bible data:', error);
             resultCount.textContent = 'Error loading data. Please try again later.';
