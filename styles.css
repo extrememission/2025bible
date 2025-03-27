@@ -41,10 +41,11 @@ body {
 .search-container {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     width: 100%;
-    margin: 0;
+    padding: 0 10px;
+    box-sizing: border-box;
 }
 
 input[type="text"] {
@@ -95,10 +96,33 @@ input[type="text"] {
     pointer-events: auto;
 }
 
+.message-link {
+    font-family: 'Anton', sans-serif;
+    display: inline-block;
+    text-shadow: 0 0 10px #d4ff00;
+    color: yellow;
+    padding: 2px 10px;
+    margin: 5px auto;
+    cursor: pointer;
+}
+
+#sticky-message {
+    font-family: 'Anton', sans-serif;
+    display: block;
+    white-space: nowrap;
+    margin-top: 10px;
+    width: 100%;
+    font-weight: 300;
+    font-size: min(4vw, 16px);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
 #app {
-    width: 90%;
+    width: 100%;
     padding: 10px;
     margin: 0;
+    box-sizing: border-box;
 }
 
 .box, .book-box, .chapter-box {
@@ -148,10 +172,10 @@ input[type="text"] {
 }
 
 #books {
-    width: calc(100% - 20px);
+    width: 100%;
     padding: 10px;
     margin: 0 auto;
-    max-width: 600px;
+    box-sizing: border-box;
 }
 
 #books:has(.book-box) {
@@ -165,12 +189,17 @@ input[type="text"] {
     padding: 5px;
     margin: 0;
     font-size: 20px;
-    font-family: 'Six Caps', sans-serif;
+    font-family: 'Anton', sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     letter-spacing: 0.1em;
+}
+
+.new-testament {
+    text-shadow: 0 0 10px #d4ff00;
+    color: yellow;
 }
 
 .chapter-box, .verse-box {
