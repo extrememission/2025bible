@@ -47,9 +47,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayBooks() {
         booksContainer.innerHTML = '';
-        for (const bookId in bookNames) {
-            const bookName = bookNames[bookId];
-            const bookBox = createBoxElement(bookName);
+        const abbreviatedBooks = [
+            "GEN", "EXO", "LEV", "NUM", "DEU", "JOS", "JDG", "RUT", "1 SAM", "2 SAM",
+            "1 KIN", "2 KIN", "1 CHR", "2 CHR", "EZR", "NEH", "EST", "JOB", "PSA", "PRO",
+            "ECC", "SNG", "ISA", "JER", "LAM", "EZE", "DAN", "HOS", "JOE", "AMO",
+            "OBA", "JON", "MIC", "NAH", "HAB", "ZEP", "HAG", "ZEC", "MAL",
+            "MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1 COR", "2 COR", "GAL", "EPH",
+            "PHP", "COL", "1 THE", "2 THE", "1 TIM", "2 TIM", "TIT", "PHM",
+            "HEB", "JAS", "1 PET", "2 PET", "1 JOH", "2 JOH", "3 JOH", "JUD", "REV"
+        ];
+        
+        abbreviatedBooks.forEach((abbr, index) => {
+            const bookId = (index + 1).toString();
+            const bookBox = createBoxElement(abbr);
             bookBox.classList.add('book-box');
             bookBox.dataset.bookId = bookId;
             bookBox.addEventListener('click', () => toggleChapters(bookId));
@@ -59,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             addTouchListeners(bookBox);
             booksContainer.appendChild(bookBox);
-        }
+        });
         showMessage("Welcome to the Extreme Mission Bible App!\nSelect a book, or enter a reference or search term to begin.");
     }
 
