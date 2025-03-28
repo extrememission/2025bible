@@ -42,5 +42,12 @@
     <script src="js/bookNames.js"></script>
     <script src="app.js"></script>
     <script src="modal.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => console.log('ServiceWorker registered'))
+                .catch(err => console.log('ServiceWorker registration failed: ', err));
+        }
+    </script>
 </body>
 </html>
