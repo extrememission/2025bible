@@ -48,13 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayBooks() {
         booksContainer.innerHTML = '';
         const abbreviatedBooks = [
-            "GEN", "EXO", "LEV", "NUM", "DEU", "JOS", "JDG", "RUT", "1 SAM", "2 SAM",
-            "1 KIN", "2 KIN", "1 CHR", "2 CHR", "EZR", "NEH", "EST", "JOB", "PSA", "PRO",
-            "ECC", "SNG", "ISA", "JER", "LAM", "EZE", "DAN", "HOS", "JOE", "AMO",
-            "OBA", "JON", "MIC", "NAH", "HAB", "ZEP", "HAG", "ZEC", "MAL",
-            "MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1 COR", "2 COR", "GAL", "EPH",
-            "PHP", "COL", "1 THE", "2 THE", "1 TIM", "2 TIM", "TIT", "PHM",
-            "HEB", "JAS", "1 PET", "2 PET", "1 JOH", "2 JOH", "3 JOH", "JUD", "REV"
+            "GE", "EX", "LE", "NU", "DE", "JO", "JU", "RU", "1S", "2S",
+            "1K", "2K", "1C", "2C", "EZ", "NE", "ES", "JO", "PS", "PR",
+            "EC", "SO", "IS", "JE", "LA", "EZ", "DA", "HO", "JO", "AM",
+            "OB", "JO", "MI", "NA", "HA", "ZE", "HA", "ZE", "MA",
+            "MA", "MA", "LU", "JO", "AC", "RO", "1C", "2C", "GA", "EP",
+            "PH", "CO", "1T", "2T", "1T", "2T", "TI", "PH",
+            "HE", "JA", "1P", "2P", "1J", "2J", "3J", "JU", "RE"
         ];
         
         abbreviatedBooks.forEach((abbr, index) => {
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addTouchListeners(bookBox);
             booksContainer.appendChild(bookBox);
         });
-        stickyMessage.style.opacity = '0';
+        stickyMessage.style.display = 'none';
     }
 
     function toggleChapters(bookId) {
@@ -92,7 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
             addTouchListeners(chapterBox);
             booksContainer.appendChild(chapterBox);
         });
-        showMessage('<span class="message-link">TAP HERE</span> OR SWIPE LEFT TO GO BACK', false);
+        stickyMessage.style.display = 'block';
+        stickyMessage.innerHTML = '<span class="message-link">TAP HERE</span> OR SWIPE LEFT TO GO BACK';
     }
 
     function getChaptersByBookId(bookId) {
@@ -186,7 +187,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 100);
             }
         });
-        showMessage("Tap the icons to copy or share a verse.\n<span class=\"message-link\">TAP HERE</span> OR SWIPE LEFT TO GO BACK", false);
+        stickyMessage.style.display = 'block';
+        stickyMessage.innerHTML = '<span class="message-link">TAP HERE</span> OR SWIPE LEFT TO GO BACK';
     }
 
     function getVersesByBookAndChapter(bookId, chapter) {
