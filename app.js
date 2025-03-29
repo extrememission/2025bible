@@ -1,3 +1,15 @@
+const ASSETS = [
+    '/',
+    '/index.html',
+    '/styles.css',
+    '/app.js',
+    '/modal.js',
+    '/modal.css',
+    '/js/bookNames.js',
+    '/data/kjv.json',
+    '/modal.png'
+];
+
 document.addEventListener('DOMContentLoaded', () => {
     const booksContainer = document.getElementById('books');
     const searchInput = document.getElementById('search');
