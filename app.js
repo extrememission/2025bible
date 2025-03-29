@@ -137,6 +137,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            const nativeShareIcon = document.createElement('i');
+            nativeShareIcon.className = 'material-icons native-share-icon';
+            nativeShareIcon.textContent = 'ios_share';
+
+            nativeShareIcon.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const parts = verseText.split('\n');
+                const formattedText = `${parts[0]}\n—${parts[1].substring(1)}`;
+                
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            text: formattedText
+                        });
+                        nativeShareIcon.textContent = 'done';
+                        setTimeout(() => nativeShareIcon.textContent = 'ios_share', 1000);
+                    } catch (err) {
+                        console.error('Share failed:', err);
+                    }
+                }
+            });
+
             const shareIcon = document.createElement('i');
             shareIcon.className = 'material-icons share-icon';
             shareIcon.textContent = 'share';
@@ -161,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             verseBox.appendChild(textDiv);
             verseBox.appendChild(copyIcon);
+            verseBox.appendChild(nativeShareIcon);
             verseBox.appendChild(shareIcon);
             verseBox.dataset.verse = verseNumber;
             verseBox.dataset.bookId = bookId;
