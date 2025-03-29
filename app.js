@@ -3,7 +3,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search');
     const resultCount = document.getElementById('result-count');
     const stickyMessage = document.getElementById('sticky-message');
+    const installButton = document.getElementById('installButton');
     const bibleData = [];
+    
+    let deferredPrompt;
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installButton.style.display = 'block';
+    });
+    
+    installButton.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installButton.style.display = 'none';
+            }
+            deferredPrompt = null;
+        }
+    });
 
     const params = new URLSearchParams(window.location.search);
     const book = params.get('book');
@@ -324,11 +344,30 @@ document.addEventListener('DOMContentLoaded', () => {
         displayBooks();
     }
 
+    const offlineToggle = document.getElementById('offlineToggle');
+    
+    offlineToggle.addEventListener('change', async (e) => {
+        if (e.target.checked) {
+            try {
+                const cache = await caches.open('bible-v2');
+                await cache.addAll(ASSETS);
+                const response = await fetch('data/kjv.json');
+                await cache.put('data/kjv.json', response.clone());
+                offlineToggle.disabled = true;
+                e.target.checked = true;
+            } catch (error) {
+                console.error('Failed to cache data:', error);
+                e.target.checked = false;
+            }
+        }
+    });
+
     fetch('data/kjv.json')
         .then(response => response.json())
         .then(data => {
             bibleData.push(...data.resultset.row);
             searchInput.addEventListener('input', debounce(searchHandler, 500));
+            window.dispatchEvent(new Event('bibleDataLoaded'));
             })
         .catch(error => {
             console.error('Error fetching Bible data:', error);

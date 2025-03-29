@@ -28,7 +28,16 @@
         <div id="books"></div>
     </div>
     
-    <div id="help-link">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <div id="offline-switch">
+            <label class="switch">
+                <input type="checkbox" id="offlineToggle">
+                <span class="slider round"></span>
+            </label>
+            <span>Offline Mode</span>
+        </div>
+        <div id="help-link">
+        <button id="installButton" style="display: none; margin-bottom: 10px;">Install App</button>
         <a href="https://extrememission.org/">extrememission.org</a>
     </div>
     

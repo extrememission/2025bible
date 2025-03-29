@@ -1,25 +1,29 @@
+
 window.onload = () => {
-    // Get the modal element
     const modal = document.getElementById('splash-modal');
+    let isDataLoaded = false;
     
-    // Flag to check if the 3 seconds have passed
-    let isThreeSecondsPassed = false;
-    
-    // Function to hide the modal
     function hideModal() {
-        if (isThreeSecondsPassed) {
+        if (!isDataLoaded) return;
+        modal.style.opacity = '0';
+        setTimeout(() => {
             modal.style.display = 'none';
-        }
+        }, 300);
     }
     
-    // Show the modal initially
     modal.style.display = 'flex';
+    modal.style.opacity = '1';
     
-    // Set a timeout to ensure the modal remains visible for at least 3 seconds
-    setTimeout(() => {
-        isThreeSecondsPassed = true;
-    }, 2000); //Changed to 2 seconds
+    window.addEventListener('bibleDataLoaded', () => {
+        isDataLoaded = true;
+        setTimeout(hideModal, 2000);
+    });
 
-    // Add click event listener to the modal to hide it only after 3 seconds
-    modal.addEventListener('click', hideModal);
+    // Ensure modal stays visible if data isn't loaded
+    setInterval(() => {
+        if (!isDataLoaded) {
+            modal.style.display = 'flex';
+            modal.style.opacity = '1';
+        }
+    }, 100);
 };
